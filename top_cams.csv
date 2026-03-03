@@ -1,0 +1,5 @@
+Platform,TOPS,The price of the module (bulk),Consumption,YOLOv8 FPS,Ecosystem
+Jetson Orin Nano Super,67,~$150–200,10–25 W,60+,The best
+Hailo-8,26,~$80–120,2–5 W,40–60,Good
+RK3588 (Orange Pi),6,~$50–100,5–10 W,20–40,Average
+Coral Dev Board,4,~$100–150,2–5 W,15–30,Limited
