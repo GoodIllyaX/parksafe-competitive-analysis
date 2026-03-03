@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ParkSafe — Competitive Analysis (Updated Mar 2026)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0e0e0e;
+    --surface: #161616;
+    --card: #1c1c1c;
+    --border: #2a2a2a;
+    --accent: #f0e040;
+    --accent2: #40d0f0;
+    --accent3: #f06060;
+    --accent4: #70f0a0;
+    --text: #e8e8e8;
+    --muted: #888;
+    --tag-bg: #252525;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 40px;
+    min-width: 1400px;
+    line-height: 1.5;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 48px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+  }
+  .header h1 { font-size: 32px; font-weight: 700; letter-spacing: -1px; }
+  .header h1 span { color: var(--accent); }
+  .header .sub { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 40px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 40px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 40px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 40px; }
+
+  .comp-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .comp-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .comp-card.direct::before { background: var(--accent3); }
+  .comp-card.indirect::before { background: var(--accent2); }
+  .comp-card.consumer::before { background: var(--accent4); }
+  .comp-card.parksafe::before { background: var(--accent); }
+
+  .comp-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .comp-type { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+  .comp-url { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--accent2); margin-bottom: 12px; }
+  .comp-url a { color: inherit; text-decoration: none; }
+  .comp-url a:hover { text-decoration: underline; }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .tag {
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .tag.green { border-color: #70f0a044; color: var(--accent4); background: #70f0a011; }
+  .tag.red { border-color: #f0606044; color: var(--accent3); background: #f0606011; }
+  .tag.yellow { border-color: #f0e04044; color: var(--accent); background: #f0e04011; }
+  .tag.blue { border-color: #40d0f044; color: var(--accent2); background: #40d0f011; }
+
+  .comp-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 12px;
+  }
+  th, td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  th { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); text-transform: uppercase; }
+  tr:hover { background: #222; }
+
+  .insight-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .insight-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 12px;
+  }
+  .insight-label.standard { background: #222; color: var(--muted); }
+  .insight-label.pain { background: #301010; color: var(--accent3); }
+  .insight-label.opportunity { background: #103020; color: var(--accent4); }
+  .insight-label.mvp { background: #302810; color: var(--accent); }
+  .insight-label.reddit { background: #301830; color: #ff4500; } /* Reddit-style orange */
+
+  .mvp-box {
+    background: #1a1a00;
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 40px 0;
+  }
+  .mvp-title { font-size: 18px; font-weight: 700; color: var(--accent); margin-bottom: 12px; }
+  .mvp-desc { font-size: 14px; line-height: 1.6; }
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>ParkSafe <span>— Competitive Analysis</span></h1>
+    <div class="sub">Updated: March 2026</div>
+  </div>
+</div>
+
+<div class="section-label">01 · Competitors (Top 5) — with X Updates</div>
+
+<div class="grid-5">
+
+  <div class="comp-card direct">
+    <div class="comp-name">Parquery</div>
+    <div class="comp-type">Direct · B2B · Global</div>
+    <div class="comp-url">X: <a href="https://x.com/parquery" target="_blank">@parquery</a> (228 followers, nearly dead, last active Oct 2024)</div>
+    <div class="tag-row">
+      <span class="tag">Edge optional</span>
+      <span class="tag red">No consumer app</span>
+      <span class="tag red">No Safety Score</span>
+    </div>
+    <div class="comp-desc">Pure B2B focus. Does not solve Alex’s JTBD (“last 50 meters” + in-garage navigation).</div>
+  </div>
+
+  <div class="comp-card direct">
+    <div class="comp-name">Parkinto</div>
+    <div class="comp-type">Direct · B2B · EU</div>
+    <div class="comp-url">X: not found</div>
+    <div class="tag-row">
+      <span class="tag">SaaS €15–40/camera</span>
+      <span class="tag red">Cloud + photos</span>
+      <span class="tag red">No Edge</span>
+    </div>
+    <div class="comp-desc">Weakest on US privacy (Mike). No driver-facing app.</div>
+  </div>
+
+  <div class="comp-card indirect">
+    <div class="comp-name">Cocoparks</div>
+    <div class="comp-type">Indirect · B2G · France</div>
+    <div class="comp-url">X: <a href="https://x.com/Cocoparks3" target="_blank">@Cocoparks3</a> (179 followers, dead since May 2024)</div>
+    <div class="tag-row">
+      <span class="tag">Municipal focus</span>
+      <span class="tag red">No consumer UX</span>
+      <span class="tag red">No Safety Score</span>
+    </div>
+    <div class="comp-desc">Does not address Alex’s nighttime fear. Not for commercial garages.</div>
+  </div>
+
+  <div class="comp-card consumer">
+    <div class="comp-name">SpotHero</div>
+    <div class="comp-type">Consumer · US</div>
+    <div class="comp-url">X: <a href="https://x.com/SpotHero" target="_blank">@SpotHero</a> (10.9k followers, active)</div>
+    <div class="tag-row">
+      <span class="tag green">Uber integration (Feb 2026)</span>
+      <span class="tag red">Booking only</span>
+      <span class="tag red">No in-garage arrows</span>
+    </div>
+    <div class="comp-desc">CarPlay limited to booking. Confirms OST pain: “last 50 m” unsolved.</div>
+  </div>
+
+  <div class="comp-card consumer">
+    <div class="comp-name">SpotAngels</div>
+    <div class="comp-type">Consumer · US</div>
+    <div class="comp-url">X: <a href="https://x.com/SpotAngels" target="_blank">@SpotAngels</a> (493 followers, dead since 2023)</div>
+    <div class="tag-row">
+      <span class="tag">Crowdsourced</span>
+      <span class="tag red">Outdated data</span>
+      <span class="tag red">No garages</span>
+    </div>
+    <div class="comp-desc">Perfectly illustrates Alex’s pain: “ghost spots” + no nighttime safety.</div>
+  </div>
+
+</div>
+
+<div class="section-label">02 · Feature Matrix (with X activity 2026)</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Feature / Pattern</th>
+      <th>SpotHero</th>
+      <th>SpotAngels</th>
+      <th>Parquery</th>
+      <th>Parkinto</th>
+      <th>Cocoparks</th>
+      <th>ParkSafe (planned)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Real-time + in-garage navigation</strong></td>
+      <td>✗</td>
+      <td>✗</td>
+      <td>✗</td>
+      <td>✗</td>
+      <td>✗</td>
+      <td>✓ (arrows)</td>
+    </tr>
+    <tr>
+      <td><strong>Safety Score</strong></td>
+      <td>✗</td>
+      <td>✗</td>
+      <td>✗</td>
+      <td>✗</td>
+      <td>✗</td>
+      <td>✓ (unique)</td>
+    </tr>
+    <tr>
+      <td><strong>Edge AI + JSON-only (CCPA unlock)</strong></td>
+      <td>✗</td>
+      <td>✗</td>
+      <td>◑</td>
+      <td>✗</td>
+      <td>✓</td>
+      <td>✓ (core)</td>
+    </tr>
+    <tr>
+      <td><strong>CarPlay with real-time arrows</strong></td>
+      <td>✗</td>
+      <td>✗</td>
+      <td>✗</td>
+      <td>✗</td>
+      <td>✗</td>
+      <td>✓ (MVP)</td>
+    </tr>
+    <tr>
+      <td><strong>X activity (2026)</strong></td>
+      <td>Active (Uber deal)</td>
+      <td>Dead</td>
+      <td>Dead</td>
+      <td>Not found</td>
+      <td>Dead</td>
+      <td>— (product focus)</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="section-label">03 · Key Gaps (from interviews, OST, hypotheses)</div>
+
+<div class="grid-2">
+  <div class="insight-card">
+    <div class="insight-label pain">⚡ UX Pain 1 — "Ghost Spots"</div>
+    <div class="insight-item">
+      Everyone shows “12 free”, but Alex still spends 2–3 min hunting a spot (Alex’s JTBD, Hypothesis 2).
+    </div>
+  </div>
+
+  <div class="insight-card">
+    <div class="insight-label pain">⚡ UX Pain 2 — Nighttime Trust Gap</div>
+    <div class="insight-item">
+      No Safety Score or lighting data. Critical for premium car owners (Alex).
+    </div>
+  </div>
+
+  <div class="insight-card">
+    <div class="insight-label opportunity">💡 Opportunity 1 — CarPlay + Real-time</div>
+    <div class="insight-item">
+      SpotHero has CarPlay for booking only. Real-time in-garage arrows — nobody does it (Hypothesis 2).
+    </div>
+  </div>
+
+  <div class="insight-card">
+    <div class="insight-label opportunity">💡 Opportunity 2 — B2B Unlock</div>
+    <div class="insight-item">
+      JSON-only = CCPA unlock for US operators (Mike, OST “Legal Cleanliness”).
+    </div>
+  </div>
+</div>
+
+<div class="mvp-box">
+  <div class="mvp-title">→ MVP Strategy (validated by OST + interviews)</div>
+  <div class="mvp-desc">
+    <strong>Edge AI (Jetson) → JSON-only → B2B dashboard</strong> for Mike (ROI, replace $1500/mo patrols) + 
+    <strong>CarPlay arrows + Safety Score</strong> for Alex (last 50 m, nighttime safety). 
+    <br><br>
+    No competitor on X is pushing these features. SpotHero went into Uber — but left us the “last mile”.
+  </div>
+</div>
+
+<div class="section-label">04 · Reddit Insights (2025–2026)</div>
+
+<div class="grid-2">
+
+  <div class="insight-card">
+    <div class="insight-label reddit">Reddit: SpotHero</div>
+    <div class="insight-item">
+      Most mentioned (Chicago, Denver, Vancouver etc.). Complaints: QR codes fail in garages, double charges, sometimes cheaper to park directly. Praised for discounts, but zero real-time in-garage navigation. Booking only.
+    </div>
+  </div>
+
+  <div class="insight-card">
+    <div class="insight-label reddit">Reddit: Other Competitors</div>
+    <div class="insight-item">
+      Parquery / Parkinto / Cocoparks — 0 mentions. SpotAngels — almost none. Pure B2B/municipal tools Reddit doesn’t know.
+    </div>
+  </div>
+
+  <div class="insight-card">
+    <div class="insight-label reddit">Reddit: General Themes</div>
+    <div class="insight-item">
+      Lots of car-feature discussions (Kia EV9, Hyundai Ioniq 5, Tesla): Remote Smart Parking Assist, how it performs in tight garages. Confirms Alex’s pain — people want the exact “last mile” (precise arrows to spot).
+    </div>
+  </div>
+
+  <div class="insight-card">
+    <div class="insight-label reddit">Reddit: Conclusion</div>
+    <div class="insight-item">
+      Real-time in-garage navigation + Safety Score niche is completely open. No threads about “parking garage navigation arrows” or “safety score in parking apps”. Your MVP looks even stronger here.
+    </div>
+  </div>
+
+</div>
+
+<div class="section-label">05 · Updated Matrix (with Reddit activity)</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Feature / Pattern</th>
+      <th>SpotHero (Reddit)</th>
+      <th>SpotAngels</th>
+      <th>Parquery/Parkinto/Cocoparks</th>
+      <th>ParkSafe (planned)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Real-time + in-garage navigation</strong></td>
+      <td>✗ (booking only)</td>
+      <td>✗</td>
+      <td>✗</td>
+      <td>✓ (arrows)</td>
+    </tr>
+    <tr>
+      <td><strong>Safety Score</strong></td>
+      <td>✗</td>
+      <td>✗</td>
+      <td>✗</td>
+      <td>✓</td>
+    </tr>
+    <tr>
+      <td><strong>Edge AI + JSON-only</strong></td>
+      <td>✗</td>
+      <td>✗</td>
+      <td>◑ (Parquery)</td>
+      <td>✓</td>
+    </tr>
+    <tr>
+      <td><strong>CarPlay with real-time arrows</strong></td>
+      <td>✗</td>
+      <td>✗</td>
+      <td>✗</td>
+      <td>✓ (MVP)</td>
+    </tr>
+    <tr>
+      <td><strong>Reddit activity (2025–2026)</strong></td>
+      <td>Medium (complaints/advice)</td>
+      <td>None</td>
+      <td>None</td>
+      <td>—</td>
+    </tr>
+  </tbody>
+</table>
+
+</body>
+</html>
