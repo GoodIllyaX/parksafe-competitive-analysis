@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ParkSafe — Competitive Analysis</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0e0e0e;
+    --surface: #161616;
+    --card: #1c1c1c;
+    --border: #2a2a2a;
+    --accent: #f0e040;
+    --accent2: #40d0f0;
+    --accent3: #f06060;
+    --accent4: #70f0a0;
+    --text: #e8e8e8;
+    --muted: #888;
+    --tag-bg: #252525;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 40px;
+    min-width: 1400px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 48px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+  }
+  .header h1 { font-size: 32px; font-weight: 700; letter-spacing: -1px; }
+  .header h1 span { color: var(--accent); }
+  .header .sub { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; }
+
+  /* ── SECTION TITLE ── */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ── GRID LAYOUTS ── */
+  .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 40px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 40px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 40px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 40px; }
+
+  /* ── COMPETITOR CARD ── */
+  .comp-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .comp-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .comp-card.direct::before { background: var(--accent3); }
+  .comp-card.indirect::before { background: var(--accent2); }
+  .comp-card.consumer::before { background: var(--accent4); }
+  .comp-card.parksafe::before { background: var(--accent); }
+
+  .comp-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .comp-type { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+  .comp-url { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--accent2); margin-bottom: 12px; }
+  .comp-url a { color: inherit; text-decoration: none; }
+  .comp-url a:hover { text-decoration: underline; }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .tag {
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .tag.green { border-color: #70f0a044; color: var(--accent4); background: #70f0a011; }
+  .tag.red { border-color: #f0606044; color: var(--accent3); background: #f0606011; }
+  .tag.yellow { border-color: #f0e04044; color: var(--accent); background: #f0e04011; }
+  .tag.blue { border-color: #40d0f044; color: var(--accent2); background: #40d0f011; }
+
+  .comp-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  /* ── UX FLOW CARD ── */
+  .flow-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .flow-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+  .flow-steps { display: flex; flex-direction: column; gap: 8px; }
+  .flow-step {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .step-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    background: #f0e04011;
+    border: 1px solid #f0e04033;
+    border-radius: 4px;
+    padding: 2px 6px;
+    min-width: 28px;
+    text-align: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-content { font-size: 12px; color: var(--text); line-height: 1.4; }
+  .step-note { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .friction { color: var(--accent3) !important; }
+  .value-moment { color: var(--accent4) !important; }
+
+  /* ── PATTERN MATRIX ── */
+  .matrix-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-bottom: 40px;
+  }
+  .matrix-table th {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    font-weight: 600;
+    text-align: left;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .matrix-table td {
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .matrix-table tr:hover td { background: #1f1f1f; }
+  .check { color: var(--accent4); font-size: 14px; }
+  .cross { color: var(--accent3); font-size: 14px; }
+  .partial { color: var(--accent); font-size: 14px; }
+
+  /* ── CONCLUSION CARDS ── */
+  .insight-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .insight-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+  .insight-label.standard { color: var(--accent2); }
+  .insight-label.pain { color: var(--accent3); }
+  .insight-label.opportunity { color: var(--accent4); }
+  .insight-label.mvp { color: var(--accent); }
+
+  .insight-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .insight-icon { font-size: 16px; flex-shrink: 0; margin-top: -1px; }
+
+  /* ── MVP BOX ── */
+  .mvp-box {
+    background: #f0e04008;
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 40px;
+  }
+  .mvp-box .mvp-title { font-size: 20px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+  .mvp-box .mvp-desc { font-size: 14px; color: var(--text); line-height: 1.6; }
+
+  /* ── LEGEND ── */
+  .legend { display: flex; gap: 20px; align-items: center; margin-bottom: 24px; }
+  .legend-item { display: flex; gap: 6px; align-items: center; font-size: 11px; color: var(--muted); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <h1>Park<span>Safe</span> — Competitive Analysis</h1>
+    <div class="sub">Market Validation · Competitor UX · Pattern Matrix · MVP Direction</div>
+  </div>
+  <div class="sub">March 2026</div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#f06060"></div> Direct (same ICP)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#40d0f0"></div> Indirect (B2B only)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#70f0a0"></div> Consumer</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f0e040"></div> ParkSafe</div>
+</div>
+
+<!-- SECTION 1: COMPETITORS -->
+<div class="section-label">01 · Competitors (5 selected)</div>
+<div class="grid-5">
+
+  <div class="comp-card direct">
+    <div class="comp-name">Parquery</div>
+    <div class="comp-type">Direct · B2B · Global</div>
+    <div class="comp-url"><a href="https://parquery.com" target="_blank">parquery.com</a></div>
+    <div class="tag-row">
+      <span class="tag blue">Edge AI option</span>
+      <span class="tag green">GDPR</span>
+      <span class="tag red">Cloud-first</span>
+    </div>
+    <div class="comp-desc">Swiss AI for parking/logistics. Camera-based, cloud or edge. Blurs plates/faces. No consumer app. B2B only. 30+ countries. Acquired by AXIS camera ecosystem.</div>
+  </div>
+
+  <div class="comp-card direct">
+    <div class="comp-name">Parkinto</div>
+    <div class="comp-type">Direct · B2B · EU</div>
+    <div class="comp-url"><a href="https://parkinto.com" target="_blank">parkinto.com</a></div>
+    <div class="tag-row">
+      <span class="tag red">Cloud images</span>
+      <span class="tag green">GDPR compliant</span>
+      <span class="tag yellow">LPR</span>
+    </div>
+    <div class="comp-desc">Czech startup. 99.7% accuracy, 30s updates. Sends images to cloud for processing. LPR (license plates). Per-camera SaaS fee. No consumer app. No edge processing.</div>
+  </div>
+
+  <div class="comp-card indirect">
+    <div class="comp-name">Cocoparks</div>
+    <div class="comp-type">Indirect · B2G · France/Global</div>
+    <div class="comp-url"><a href="https://cocoparks.io" target="_blank">cocoparks.io</a></div>
+    <div class="tag-row">
+      <span class="tag blue">Smart City focus</span>
+      <span class="tag green">RGPD/GDPR</span>
+      <span class="tag red">No consumer app</span>
+    </div>
+    <div class="comp-desc">French startup. Municipal/urban focus. Curb + parking analytics. Edge AI, low power embedded. City-level deployments (Shimla, India). No individual driver UX.</div>
+  </div>
+
+  <div class="comp-card consumer">
+    <div class="comp-name">SpotHero</div>
+    <div class="comp-type">Consumer · USA · Booking</div>
+    <div class="comp-url"><a href="https://spothero.com" target="_blank">spothero.com</a></div>
+    <div class="tag-row">
+      <span class="tag green">CarPlay</span>
+      <span class="tag green">300+ cities</span>
+      <span class="tag red">Pre-booking only</span>
+    </div>
+    <div class="comp-desc">Largest US parking reservation app. Pre-book garages. No real-time street/lot occupancy. No safety score. $1B+ reservations sold. Strong B2B expense integration.</div>
+  </div>
+
+  <div class="comp-card consumer">
+    <div class="comp-name">SpotAngels</div>
+    <div class="comp-type">Consumer · USA · Street</div>
+    <div class="comp-url"><a href="https://www.spotangels.com" target="_blank">spotangels.com</a></div>
+    <div class="tag-row">
+      <span class="tag green">Community reports</span>
+      <span class="tag yellow">Street parking</span>
+      <span class="tag red">No safety score</span>
+    </div>
+    <div class="comp-desc">Crowdsourced street parking + restriction alerts. Community-driven availability. No garage occupancy data. No privacy architecture. No B2B. US urban market.</div>
+  </div>
+
+</div>
+
+<!-- SECTION 2: UX FLOWS -->
+<div class="section-label">02 · User Flow Breakdown (3 apps)</div>
+<div class="grid-3">
+
+  <!-- SpotHero Flow -->
+  <div class="flow-card">
+    <div class="flow-title">SpotHero — Consumer · Pre-book flow</div>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="step-num">01</div>
+        <div class="step-content">Open app → Location auto-detected / enter address
+          <div class="step-note">Fast entry, map loads immediately</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">02</div>
+        <div class="step-content">Set date/time range → Map shows pins with prices
+          <div class="step-note friction">⚡ Friction: must set time before seeing options</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">03</div>
+        <div class="step-content">Select garage → See distance, price, amenities
+          <div class="step-note">No safety or lighting info shown</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">04</div>
+        <div class="step-content">Pre-pay → Get parking pass
+          <div class="step-note value-moment">✓ Value: guaranteed spot, no cash</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">05</div>
+        <div class="step-content">Navigate to garage → Show pass on entry
+          <div class="step-note friction">⚡ Friction: directions leave app (Google Maps)</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">06</div>
+        <div class="step-content">CarPlay mode: limited to search + book
+          <div class="step-note value-moment">✓ Value: hands-free, but no real-time availability</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parquery B2B Flow -->
+  <div class="flow-card">
+    <div class="flow-title">Parquery — B2B Operator dashboard flow</div>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="step-num">01</div>
+        <div class="step-content">Login → Parking site map overview
+          <div class="step-note">All zones visible, color-coded occupancy</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">02</div>
+        <div class="step-content">Select zone → Real-time spot count + % full
+          <div class="step-note value-moment">✓ Value: instant operational overview</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">03</div>
+        <div class="step-content">Analytics tab → Hourly/daily occupancy charts
+          <div class="step-note">Average duration, peak times, trends</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">04</div>
+        <div class="step-content">Alerts: overstay / capacity threshold notifications
+          <div class="step-note friction">⚡ Friction: alert setup is complex, IT-heavy</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">05</div>
+        <div class="step-content">API access → Integrate with 3rd-party systems
+          <div class="step-note">OpenAPI docs provided</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">06</div>
+        <div class="step-content">No consumer-facing component at all
+          <div class="step-note friction">⚡ Gap: operators can't share occupancy with drivers</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SpotAngels Flow -->
+  <div class="flow-card">
+    <div class="flow-title">SpotAngels — Consumer · Street parking flow</div>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="step-num">01</div>
+        <div class="step-content">Open app → Street map with color-coded restrictions
+          <div class="step-note value-moment">✓ Value: immediately see where you can park</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">02</div>
+        <div class="step-content">Tap street → See rules (hours, time limits, permits)
+          <div class="step-note">Community-verified data</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">03</div>
+        <div class="step-content">Community report: "I see a free spot" / "just left"
+          <div class="step-note friction">⚡ Friction: stale data — reports age fast</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">04</div>
+        <div class="step-content">No navigation inside garage/parking lot
+          <div class="step-note friction">⚡ Gap: zero indoor guidance once you enter</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">05</div>
+        <div class="step-content">No safety score, no lighting info, no privacy architecture
+          <div class="step-note friction">⚡ Gap: no "is this safe?" signal</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">06</div>
+        <div class="step-content">Gamification: points for reports
+          <div class="step-note value-moment">✓ Value: community incentive works for street data</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- SECTION 3: PATTERN MATRIX -->
+<div class="section-label">03 · Pattern Matrix</div>
+<table class="matrix-table">
+  <thead>
+    <tr>
+      <th>Feature / Pattern</th>
+      <th>Parquery</th>
+      <th>Parkinto</th>
+      <th>Cocoparks</th>
+      <th>SpotHero</th>
+      <th>SpotAngels</th>
+      <th style="color:var(--accent)">ParkSafe (planned)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Real-time occupancy</strong></td>
+      <td><span class="check">✓</span> B2B only</td>
+      <td><span class="check">✓</span> B2B only</td>
+      <td><span class="check">✓</span> B2G only</td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="check" style="color:var(--accent)">✓</span> B2B + Consumer</td>
+    </tr>
+    <tr>
+      <td><strong>Edge AI (no cloud video)</strong></td>
+      <td><span class="partial">◑</span> Optional</td>
+      <td><span class="cross">✗</span> Cloud images</td>
+      <td><span class="check">✓</span></td>
+      <td><span class="cross">✗</span> N/A</td>
+      <td><span class="cross">✗</span> N/A</td>
+      <td><span class="check" style="color:var(--accent)">✓</span> Core architecture</td>
+    </tr>
+    <tr>
+      <td><strong>GDPR / CCPA compliant</strong></td>
+      <td><span class="check">✓</span></td>
+      <td><span class="check">✓</span></td>
+      <td><span class="check">✓</span></td>
+      <td><span class="partial">◑</span></td>
+      <td><span class="partial">◑</span></td>
+      <td><span class="check" style="color:var(--accent)">✓</span> Privacy-by-design</td>
+    </tr>
+    <tr>
+      <td><strong>Consumer mobile app</strong></td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="partial">◑</span> Basic only</td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="check">✓</span></td>
+      <td><span class="check">✓</span></td>
+      <td><span class="check" style="color:var(--accent)">✓</span> React Native</td>
+    </tr>
+    <tr>
+      <td><strong>Safety Score</strong></td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="check" style="color:var(--accent)">✓</span> Unique feature</td>
+    </tr>
+    <tr>
+      <td><strong>CarPlay / Android Auto</strong></td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="check">✓</span> CarPlay</td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="check" style="color:var(--accent)">✓</span> Planned</td>
+    </tr>
+    <tr>
+      <td><strong>Community reports</strong></td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="check">✓</span></td>
+      <td><span class="check" style="color:var(--accent)">✓</span> + gamification</td>
+    </tr>
+    <tr>
+      <td><strong>Dynamic pricing API</strong></td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="check">✓</span> SpotHero IQ</td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="check" style="color:var(--accent)">✓</span> Near-MVP</td>
+    </tr>
+    <tr>
+      <td><strong>In-garage navigation (arrows)</strong></td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="cross">✗</span></td>
+      <td><span class="check" style="color:var(--accent)">✓</span> Core MVP feature</td>
+    </tr>
+    <tr>
+      <td><strong>UX pattern: onboarding</strong></td>
+      <td>B2B setup, complex</td>
+      <td>Portal signup, easy</td>
+      <td>City tender, long</td>
+      <td>1-tap search → book</td>
+      <td>Map-first, immediate</td>
+      <td style="color:var(--accent)">Map-first + permission flow</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- SECTION 4: CONCLUSIONS -->
+<div class="section-label">04 · Conclusions</div>
+
+<div class="grid-4" style="margin-bottom: 32px;">
+
+  <div class="insight-card">
+    <div class="insight-label standard">📐 Market Standard 1</div>
+    <div class="insight-item">
+      <div>B2B SaaS = per-camera monthly fee. Everyone charges €15–40/camera/month. Operators expect this model.</div>
+    </div>
+  </div>
+
+  <div class="insight-card">
+    <div class="insight-label standard">📐 Market Standard 2</div>
+    <div class="insight-item">
+      <div>GDPR compliance is table stakes in EU. "We don't store images" is now a baseline, not a differentiator — unless you add "not even on edge."</div>
+    </div>
+  </div>
+
+  <div class="insight-card">
+    <div class="insight-label standard">📐 Market Standard 3</div>
+    <div class="insight-item">
+      <div>Consumer apps = pre-booking marketplace (SpotHero). Real-time occupancy in consumer UX is an unsolved problem — nobody does it well.</div>
+    </div>
+  </div>
+
+  <div class="insight-card" style="grid-column: span 1;">
+    <div class="insight-label mvp">🎯 MVP Direction</div>
+    <div style="font-size: 14px; font-weight: 600; color: var(--accent); margin-bottom: 6px;">Edge AI + Consumer slot guidance</div>
+    <div style="font-size: 12px; color: var(--muted); line-height: 1.5;">B2B pays for the infra. Consumer gets the in-garage arrow UX nobody else has. Privacy moat enables both.</div>
+  </div>
+
+</div>
+
+<div class="grid-2">
+
+  <div class="insight-card">
+    <div class="insight-label pain">⚡ UX Pain 1 — "Ghost spots"</div>
+    <div class="insight-item">
+      <div style="font-size: 13px; line-height: 1.5;">All consumer apps show counts ("12 free") but zero navigation inside the lot. User still wastes 2–3 min finding the actual spot after seeing the number. <strong style="color:var(--accent3)">The last 50 meters are unsolved.</strong></div>
+    </div>
+  </div>
+
+  <div class="insight-card">
+    <div class="insight-label pain">⚡ UX Pain 2 — Trust collapse at night</div>
+    <div class="insight-item">
+      <div style="font-size: 13px; line-height: 1.5;">No app shows safety/lighting data. Users (especially women, BMW M5 owners) choose suboptimal lots due to fear. Community reports exist in SpotAngels but cover only street — <strong style="color:var(--accent3)">garages are a blind spot.</strong></div>
+    </div>
+  </div>
+
+  <div class="insight-card">
+    <div class="insight-label opportunity">💡 Opportunity 1 — CarPlay + real-time</div>
+    <div class="insight-item">
+      <div style="font-size: 13px; line-height: 1.5;">SpotHero has CarPlay but only for pre-booking. Zero competitors offer <strong style="color:var(--accent4)">real-time occupancy + in-garage arrow guidance via CarPlay</strong>. This is Alex's exact job-to-be-done.</div>
+    </div>
+  </div>
+
+  <div class="insight-card">
+    <div class="insight-label opportunity">💡 Opportunity 2 — B2B privacy unlock</div>
+    <div class="insight-item">
+      <div style="font-size: 13px; line-height: 1.5;">Parkinto and Parquery still send images to cloud (even if deleted). <strong style="color:var(--accent4)">JSON-only edge processing is a legal unlock</strong> for CCPA/CA operators (Mike's persona) who currently can't deploy any camera analytics at all.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MVP BOX -->
+<div class="mvp-box">
+  <div class="mvp-title">→ MVP Direction</div>
+  <div class="mvp-desc">
+    <strong>Edge AI (Jetson) → JSON only → B2B dashboard</strong> for 1 operator (Mike) + <strong>Consumer CarPlay/map with slot-level arrow guidance</strong> (Alex). No competitor does both. Privacy moat makes the B2B sale in CCPA markets. In-garage navigation creates consumer retention that SpotHero and SpotAngels can't replicate without operator data.
+  </div>
+</div>
+
+</body>
+</html>
