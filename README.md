@@ -1,67 +1,68 @@
 # 🅿️ ParkSafe — AI Parking & Safety Assistant
 
-**ParkSafe** — це гібридна B2B та B2C платформа, яка використовує Edge AI для моніторингу паркувальних місць у реальному часі з повним дотриманням приватності (Privacy-by-Design).
+**ParkSafe** is a hybrid B2B and B2C platform that leverages Edge AI for real-time parking spot monitoring with a strict commitment to privacy (Privacy-by-Design).
 
-## 📌 Огляд проекту
-Проект вирішує проблему неефективного пошуку парковки ("cruising") та страху за безпеку автомобіля, надаючи водіям точну навігацію до конкретних слотів, а операторам — інструменти автоматизації без юридичних ризиків.
+## 📌 Project Overview
+The project addresses the problem of inefficient parking searches ("cruising") and vehicle safety concerns. It provides drivers with precise navigation to specific spots while offering operators automation tools without legal risks.
 
-## 🛠 Технічний стек
-* **Computer Vision:** YOLOv8 на NVIDIA Jetson (Edge processing).
+## 🛠 Tech Stack
+* **Computer Vision:** YOLOv8 on NVIDIA Jetson (Edge processing).
 * **Backend:** FastAPI (Python), PostgreSQL + PostGIS.
 * **Mobile:** React Native + Mapbox SDK + CarPlay Integration.
-* **Architecture:** JSON-only data transfer (ніякого відео в хмарі).
+* **Architecture:** JSON-only data transfer (no video streaming to the cloud).
 
 ---
 
-## 👥 Персони користувачів
+## 👥 User Personas
 
-### 👔 Майк (B2B Оператор)
-* **Роль:** Operations Manager великого ТРЦ у Сан-Хосе.
-* **Ціль:** Автоматизувати моніторинг 1500 місць та впровадити динамічні тарифи.
-* **Біль:** Страх перед судовими позовами за незаконне відеостеження (CCPA).
-* **Рішення:** Edge AI, який передає лише цифри, а не відео.
+### 👔 Mike (B2B Operator)
+* **Role:** Operations Manager at a large mixed-use development in San Jose.
+* **Goal:** Automate monitoring for 1,500 spots and implement dynamic pricing.
+* **Pain:** Fear of lawsuits due to illegal video surveillance (CCPA).
+* **Solution:** Edge AI that transmits only numerical data (JSON) instead of video.
 
-### 🏎 Алекс (B2C Водій)
-* **Роль:** Senior Software Engineer, власник BMW M5.
-* **Ціль:** Швидко знайти безпечне місце (Safety Score) через CarPlay.
-* **Біль:** СДУГ-фактор (важкість концентрації), "місця-привиди" в Google Maps.
-* **Рішення:** Навігація "Останньої милі" прямо до вільного слота.
+### 🏎 Alex (B2C Driver)
+* **Role:** Senior Software Engineer, BMW M5 owner.
+* **Goal:** Quickly find a secure spot (Safety Score) via CarPlay.
+* **Pain:** ADHD-factor (difficulty concentrating), "ghost spots" in Google Maps.
+* **Solution:** "Last Mile" navigation directly to an available slot.
 
 ---
 
 ## 🎯 Job-To-Be-Done (JTBD)
 
-**Для Алекса:**
-> **Коли** я поспішаю на зустріч у забитому центрі на BMW M5, **я хочу** миттєво знайти вільне та безпечне місце через CarPlay, **щоб** встигнути вчасно, не витрачаючи нерви на "кружляння" по поверхах.
+**For Alex:**
+> **When** I'm rushing to a meeting in a congested downtown area in my BMW M5, **I want to** instantly find an available and secure spot via CarPlay, **so I can** arrive on time without wasting nerves on "cruising" through parking levels.
 
-**Для Майка:**
-> **Коли** на моїй парковці виникають затори, а юристи блокують камери, **я хочу** впровадити анонімний AI-моніторинг, **щоб** оптимізувати трафік та звільнити патрульних, не порушуючи закони приватності.
+**For Mike:**
+> **When** my parking lot gets congested and legal teams block traditional cameras, **I want to** implement anonymous AI monitoring **so I can** optimize traffic and free up patrols without violating privacy laws.
 
 ---
 
 ## 🌳 Opportunity Solution Tree (OST)
 
-Ми структурували розробку навколо головної мети: **Зменшити середній час пошуку місця на 30% при 100% дотриманні приватності.**
+Development is structured around a core goal: **Reduce average cruising time by 30% while maintaining 100% privacy.**
 
-* **Opportunity (Можливості):**
-    * Вектор Алекса: Швидкість та безпека (CarPlay, Safety Score).
-    * Вектор Майка: Юридична чистота та ROI (Edge AI, JSON-only).
-* **Solutions (Рішення):** Нативний CarPlay інтерфейс, архітектура без передачі відеопотоку.
-* **Experiments (Експерименти):** Запуск симуляції даних для Dashboard, інтерв'ю з користувачами щодо прототипів навігації.
-
----
-
-## 💡 Продуктові гіпотези (Core Solution)
-
-**Обрана гіпотеза:** > Якщо ми реалізуємо навігацію **«Останньої милі»** (Варіант: **Slot Highlighter** — вибір одного ідеального місця), тоді ми змінимо поведінку водія від "хаотичного пошуку" до "прямого слідування", що призведе до зменшення показника *cruising time*.
-
-**Обґрунтування:**
-1.  Інтерфейс CarPlay має бути максимально простим.
-2.  Врахування СДУГ-фактору користувачів (мінімум вибору — максимум результату).
-3.  Відсутність потреби у складних інфраструктурних роботах (не треба копати ями для оптоволокна).
+* **Opportunities:**
+    * Alex Vector: Speed and Safety (CarPlay, Safety Score).
+    * Mike Vector: Legal Compliance and ROI (Edge AI, JSON-only).
+* **Solutions:** Native CarPlay interface, architecture without cloud video streaming.
+* **Experiments:** Launching data simulations for the Dashboard, user interviews on navigation prototypes.
 
 ---
 
-## 📊 Аналіз ринку
-Репозиторій містить детальний файл `parksafe-competitive-analysis.html`, який порівнює ParkSafe з лідерами ринку (**SpotHero, Parquery, Parkinto**). 
-**Наша унікальність:** Поєднання B2B-інфраструктури (Edge AI) з унікальним B2C-досвідом (навігація до слота всередині паркінгу).
+## 💡 Product Hypotheses (Core Solution)
+
+**Selected Hypothesis:**
+> If we implement **"Last Mile"** navigation (Variant: **Slot Highlighter** — selecting a single ideal spot), then we will change driver behavior from "chaotic searching" to "direct following," resulting in a decrease in *cruising time*.
+
+**Rationale:**
+1.  CarPlay interface must be as simple as possible.
+2.  Accounting for the ADHD-factor of users (minimum choice — maximum result).
+3.  No need for complex infrastructure work (no fiber optic trenching required).
+
+---
+
+## 📊 Market Analysis
+The repository includes a detailed `parksafe-competitive-analysis.html` file comparing ParkSafe with market leaders (**SpotHero, Parquery, Parkinto**).
+**Our Uniqueness:** Combining B2B infrastructure (Edge AI) with a unique B2C experience (in-garage navigation to the slot).
